@@ -1,3 +1,4 @@
+import json
 import urllib.request
 
 class fitgirl_repacks(object):
@@ -11,8 +12,10 @@ class fitgirl_repacks(object):
         response = urllib.request.urlopen(search_url)
         response_json = json.loads(response)
 
-        what = unquote(what)
+        
         search_terms = what.lower().split()
+
+        hits = []
 
         for result in response_json['downloads']:
             if any(term in result['title'].lower() for term in search_terms):
@@ -23,7 +26,8 @@ class fitgirl_repacks(object):
                        'leech': '-1',
                        'engine_url': self.url,
                        'desc_link': '-1'}
-                prettyPrinter(res)
+                hits.append(res)
+        return hits
 
     def download_link(self, result):
             return result['uris'][0]
