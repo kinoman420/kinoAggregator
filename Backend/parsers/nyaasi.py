@@ -115,6 +115,7 @@ class nyaasi(object):
                      (e.g. "Ubuntu+Linux")
         :param cat:  the name of a search category, see supported_categories.
         """
+        what = what.replace(" ", '+')
         url = str("{0}/?f=0&s=seeders&o=desc&c=0_0&q={1}&s=seeders&o=desc"
                   .format(self.url, what))
 

@@ -1,5 +1,7 @@
 import json
-import urllib.request
+from urllib.request import Request, urlopen
+from urllib.parse import unquote
+
 
 class fitgirl_repacks(object):
     url = 'https://fitgirl-repacks.site/'
@@ -9,10 +11,13 @@ class fitgirl_repacks(object):
     def search(self, what, cat='all'):
         search_url = 'https://hydralinks.cloud/sources/fitgirl.json'
 
-        response = urllib.request.urlopen(search_url)
-        response_json = json.loads(response)
+        req = Request(url=search_url, headers={'User-Agent': 'Mozilla/5.0'} )
 
-        
+        res = urlopen(req)
+        html_response = res.read().decode('utf-8')
+        response_json = json.loads(html_response)
+
+        what = unquote(what)
         search_terms = what.lower().split()
 
         hits = []
