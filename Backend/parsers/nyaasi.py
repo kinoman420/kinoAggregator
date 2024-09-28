@@ -53,24 +53,18 @@ class nyaasi(object):
                     hit['engine_url'] = self.engine_url
                     self.curr = hit
             elif 'href' in params and self.curr:
-                # skip unrelated links
+            
                 if not params['href'].startswith("magnet:?") and \
                         not params['href'].endswith(".torrent"):
                     return
 
-                # check whether to use torrent files or magnet links,
-                # then search for a matching download link, and move on
-                # if not self.use_magnet_links and \
-                #         params['href'].endswith(".torrent"):
-                #     self.curr['link'] = self.engine_url + params['href']
-                #     self.td_counter += 1
 
                 elif params['href'].startswith("magnet:?"):
                     self.curr['link'] = params['href']
                     self.td_counter += 1
 
         def start_td(self):
-            """Handle the opening of a table cell tag."""
+            
             # Keep track of timers
             if self.td_counter >= 0:
                 self.td_counter += 1
@@ -83,7 +77,7 @@ class nyaasi(object):
                 self.td_counter = -1
 
         def handle_data(self, data):
-            """Extract data about the torrent."""
+         
             # These fields matter
             if self.td_counter > 0 and self.td_counter <= 5:
                 # Catch the size
@@ -107,14 +101,7 @@ class nyaasi(object):
 
 
     def search(self, what, cat='all'):
-        """
-        Retreive and parse engine search results by category and query.
-
-        Parameters:
-        :param what: a string with the search tokens, already escaped
-                     (e.g. "Ubuntu+Linux")
-        :param cat:  the name of a search category, see supported_categories.
-        """
+        
         what = what.replace(" ", '+')
         url = str("{0}/?f=0&s=seeders&o=desc&c=0_0&q={1}&s=seeders&o=desc"
                   .format(self.url, what))
