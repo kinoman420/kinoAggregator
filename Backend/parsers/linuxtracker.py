@@ -103,13 +103,13 @@ class linuxtracker(object):
         page = 1
         parser = self.LinuxSearchParser(hits, self.url)
         while True:
-            rres = urllib.request.urlopen(url + "&p={}".format(page))
+            res = urllib.request.urlopen(url + "&p={}".format(page))
             html_response = res.read()
             encoding = res.headers.get_content_charset('utf-8')
             decoded_html = html_response.decode(encoding)
-            parser.feed(res)
+            parser.feed(decoded_html)
             for each in hits:
-                res.append(hits)
+                res.append(each)
 
             if len(hits) < 15:
                 break
