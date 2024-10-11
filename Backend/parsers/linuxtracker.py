@@ -1,4 +1,7 @@
-import urllib.request
+
+import json
+from urllib.request import Request, urlopen
+from urllib.parse import unquote
 
 
 
@@ -93,23 +96,25 @@ class linuxtracker(object):
         """Retrieve and save url as a temporary file."""
 
 
-    def search(self, what, cat='all'):
+    def search(self, what: str, cat='all'):
 
         url = str("{0}/index.php?page=torrents"
-                  "&active=1&order=5&by=2&search={1}").format(self.url, what)
+                  "&active=1&order=5&by=2&search={1}").format(self.url, what.replace(" ", "+"))
 
         hits = []
-        res = []
+        result = []
         page = 1
         parser = self.LinuxSearchParser(hits, self.url)
         while True:
-            res = urllib.request.urlopen(url + "&p={}".format(page))
-            html_response = res.read()
-            encoding = res.headers.get_content_charset('utf-8')
-            decoded_html = html_response.decode(encoding)
-            parser.feed(decoded_html)
+            req = Request(url=url, headers={'User-Agent': 'Mozilla/5.0'})
+
+            res = urlopen(req)
+            html_response = res.read().decode('utf-8')
+            #response_json = json.loads(html_response)
+
+            parser.feed(html_response)
             for each in hits:
-                res.append(each)
+                result.append(each)
 
             if len(hits) < 15:
                 break
@@ -117,4 +122,4 @@ class linuxtracker(object):
             page += 1
 
         parser.close()
-        return res
+        return result
