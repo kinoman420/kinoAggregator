@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from parsers import nyaasi,fitgirl,dodi,linuxtracker,torrentgalaxy, rarbg2, yts
+from parsers import nyaasi,fitgirl,dodi, yts
 
 
 app = FastAPI()
