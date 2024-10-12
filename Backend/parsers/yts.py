@@ -9,15 +9,7 @@ import json
 
 
 class yts_mx(object):
-    """
-    `url`, `name`, `supported_categories` should be static variables of the engine_name class,
-     otherwise qbt won't install the plugin.
 
-    `url`: The URL of the search engine.
-    `name`: The name of the search engine, spaces and special characters are allowed here.
-    `supported_categories`: What categories are supported by the search engine and their corresponding id,
-    possible categories are ('all', 'anime', 'books', 'games', 'movies', 'music', 'pictures', 'software', 'tv').
-    """
 
     url = 'https://yts.mx/'
     api_url = 'https://yts.mx/api/v2/list_movies.json?'
@@ -29,26 +21,19 @@ class yts_mx(object):
 
     def __init__(self):
         """
-        Some initialization
+         hello
         """
 
     def search(self, what, cat='all'):
-        """
-        Here you can do what you want to get the result from the search engine website.
-        Everytime you parse a result line, store it in a dictionary
-        and call the prettyPrint(your_dict) function.
-
-        `what` is a string with the search tokens, already escaped (e.g. "Ubuntu+Linux")
-        `cat` is the name of a search category in ('all', 'anime', 'books', 'games', 'movies', 'music', 'pictures', 'software', 'tv')
-        """
+       
 
         result = []
         search_url = self.api_url
         
         what = unquote(what)
-        search_params = {'sort_by': 'title'}  # used for duplicate checking
+        search_params = {'sort_by': 'title'}  
 
-        # quality tagging
+        
         quality_rstring = r'(?:quality=)?((?:2160|1440|1080|720|480|240)p|3D)'
         quality_re = re.search(quality_rstring, what)
         search_resolution = None
@@ -56,17 +41,17 @@ class yts_mx(object):
             search_resolution = quality_re.group(1)
             search_params['quality'] = search_resolution
             what = re.sub(quality_rstring, '', what).strip()
-        # yts.mx only supports h264/h265 in search results at time of writing
+        
         codec_rstring = r'(?:\.?(?:x|h)(264|265))'
         codec_re = re.search(codec_rstring, what)
         search_codec = None
         if codec_re:
             search_codec = 'x' + codec_re.group(1)
             if 'quality' in search_params:
-                search_params['quality'] += f'.{search_codec}'  # only add if quality also defined, will be checked separately anyways
+                search_params['quality'] += f'.{search_codec}'  
             what = re.sub(codec_rstring, '', what).strip()
 
-        # rating tagging
+        
         rating_rstring = r'(?:min(?:imum)?_)?rating=(\d)'
         rating_re = re.search(rating_rstring, what)
         min_rating = None
@@ -75,13 +60,13 @@ class yts_mx(object):
             search_params['minimum_rating'] = {min_rating}
             what = re.sub(rating_rstring, '', what).strip()
 
-        # genre tagging not implemented due to inconsistencies - may do later
+        
 
-        # prevent user causing page errors
+        
         search_rstring = r'&page=\d+'
         what = re.sub(search_rstring, '', what).strip()
 
-        # url finalisation
+        
         if what:
             search_params['query_term'] = what
         search_url += urlencode(search_params)

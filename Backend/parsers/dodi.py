@@ -1,5 +1,4 @@
-#VERSION: 1.0
-# AUTHORS: Bioux
+
 
 import json
 from urllib.request import Request, urlopen

@@ -31,12 +31,12 @@ class nyaasi(object):
             self.td_counter = -1
 
         def handle_starttag(self, tag, attr):
-            """Tell the parser what to do with which tags."""
+            
             if tag == 'a':
                 self.start_a(attr)
 
         def handle_endtag(self, tag):
-            """Handle the closing of table cells."""
+            
             if tag == 'td':
                 self.start_td()
 
@@ -65,12 +65,11 @@ class nyaasi(object):
 
         def start_td(self):
             
-            # Keep track of timers
+            
             if self.td_counter >= 0:
                 self.td_counter += 1
 
-            # Add the hit to the results,
-            # then reset the counters for the next result
+            
             if self.td_counter >= 5:
                 self.results.append(self.curr)
                 self.curr = None
@@ -78,18 +77,18 @@ class nyaasi(object):
 
         def handle_data(self, data):
          
-            # These fields matter
+            
             if self.td_counter > 0 and self.td_counter <= 5:
-                # Catch the size
+                
                 if self.td_counter == 1:
                     self.curr['size'] = data.strip()
-                # Catch the seeds
+                
                 elif self.td_counter == 3:
                     try:
                         self.curr['seeds'] = int(data.strip())
                     except ValueError:
                         self.curr['seeds'] = -1
-                # Catch the leechers
+                
                 elif self.td_counter == 4:
                     try:
                         self.curr['leech'] = int(data.strip())

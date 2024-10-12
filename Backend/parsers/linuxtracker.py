@@ -11,7 +11,7 @@ import re
 
 
 class linuxtracker(object):
-    """Class used by qBittorrent to search for torrents"""
+    
 
     url = 'http://linuxtracker.org'
     name = 'Linux Tracker'
@@ -90,10 +90,9 @@ class linuxtracker(object):
                 self.wait_for_data = False
 
     def __init__(self):
-        """class initialization"""
+        """"""
 
-    def download_torrent(self, info):
-        """Retrieve and save url as a temporary file."""
+
 
 
     def search(self, what: str, cat='all'):
