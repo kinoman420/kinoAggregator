@@ -109,7 +109,7 @@ class nyaasi(object):
         result = []
         page = 1
         parser = self.NyaasiParser(hits, self.url,)
-        while True:
+        while page < 2:
            
            # https://stackoverflow.com/questions/42212800/httpresponse-to-string-python
             res = urllib.request.urlopen(url + "&p={}".format(page))
@@ -118,7 +118,7 @@ class nyaasi(object):
             decoded_html = html_response.decode(encoding)
 
             parser.feed(decoded_html)
-            for each in hits:
+            for each in hits[:20]:
                 result.append(each)
 
             if len(hits) < 75:
