@@ -22,8 +22,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     OTP_EXPIRE_TIME: int
 
+    class Config:
+        env_file = ".env"
+        env_file_encoding = 'utf-8'
+
 @lru_cache
-@logger.catch
 def get_settings():
     return Settings()
 
@@ -49,20 +52,16 @@ EntityBase = declarative_base()
 
 def init_db() -> bool:
     EntityBase.metadata.create_all(bind=engine)
-    logger.info("Database Initialized")
     return True
 
 
 try:
     if not database_exists(engine.url):
-        logger.info("Creating Database")
         create_database(engine.url)
-        logger.info("Database Created")
 except Exception as e:
-    logger.error(f"Error: {e}")
+    pass
 
 session_local = sessionmaker(autoflush=False, autocommit=False, bind=engine)
-logger.info("Database Session Created")
 
 
 def get_entitybase():
@@ -74,7 +73,6 @@ def get_db() -> Generator[Session, None, None]:
     try:
         yield db
     except SQLAlchemyError as ex:
-        logger.error(f"Database error during session: {ex}")
         db.rollback()  
         raise  
     finally:

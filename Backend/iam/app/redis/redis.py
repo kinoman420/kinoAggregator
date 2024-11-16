@@ -1,7 +1,7 @@
 from redis import Redis
 from loguru import logger
 
-from db.Database.database import get_settings
+from ..db.Database.database import get_settings
 
 config = get_settings()
 

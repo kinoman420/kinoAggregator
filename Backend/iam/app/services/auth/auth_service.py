@@ -5,12 +5,12 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
-from db.Database.models import User
-from db.Database.token_schema import TokenSchema
-from db.Database.user_schema import UserLoginSchema
-from hash_service import HashService
-from base_service import BaseService
-from user_service import UserService
+from ...db.Database.models import User
+from ...db.Database.token_schema import TokenSchema
+from ...db.Database.user_schema import UserLoginSchema
+from .hash_service import HashService
+from ..base_service import BaseService
+from ..user_service import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/users/Token")
 
@@ -26,19 +26,19 @@ class AuthService(BaseService):
         self.hash_service = hash_service
 
     async def authenticate_user(self, user: UserLoginSchema) -> TokenSchema:
-        existing_user = await self.user_service.get_user_by_mobile_number(
-            user.mobile_number
+        existing_user = await self.user_service.get_user_by_email(
+            user.email
         )
-        logger.info(f"Authenticating user with mobile number {user.mobile_number}")
+        logger.info(f"Authenticating user with email {user.email}")
 
         if not existing_user:
-            logger.error(f"User with mobile number {user.mobile_number} does not exist")
+            logger.error(f"User with email {user.email} does not exist")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User does not exist"
             )
 
         if not existing_user.is_verified:
-            logger.error(f"User with mobile number {user.mobile_number} is not verified")
+            logger.error(f"User with email {user.email} is not verified")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User is not verified"
             )
@@ -46,7 +46,7 @@ class AuthService(BaseService):
         if not self.hash_service.verify_password(
             user.password, existing_user.hashed_password
         ):
-            logger.error(f"Invalid password for user with mobile number {user.mobile_number}")
+            logger.error(f"Invalid password for user with email {user.email}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username or password",
@@ -54,7 +54,7 @@ class AuthService(BaseService):
             )
         access_token = self.create_access_token(data={"sub": str(existing_user.id)})
 
-        logger.info(f"User with mobile number {user.mobile_number} authenticated successfully")
+        logger.info(f"User with email {user.email} authenticated successfully")
         return TokenSchema(access_token=access_token, token_type="bearer")
 
     def create_access_token(self, data: dict) -> str:
@@ -97,3 +97,8 @@ async def get_current_user(
 
     logger.info(f"User with id {user_id} validated successfully")
     return user
+
+async def get_current_active_admin(current_user: User = Depends(get_current_user)):
+    if not current_user.admin:
+        raise HTTPException(status_code=400, detail="Not an admin")
+    return current_user

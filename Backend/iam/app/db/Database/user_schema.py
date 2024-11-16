@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, EmailStr
 
-from token_schema import TokenSchema
+from .token_schema import TokenSchema
 
 
 class UserBaseSchema(BaseModel):
@@ -15,6 +15,9 @@ class UserBaseSchema(BaseModel):
 
 class UserCreateSchema(UserBaseSchema):
     password: str
+
+class AdminCreateSchema(UserCreateSchema):
+    admin: bool
 
 
 class UserLoginSchema(BaseModel):

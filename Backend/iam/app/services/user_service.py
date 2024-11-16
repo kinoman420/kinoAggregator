@@ -3,11 +3,11 @@ from uuid import UUID
 from loguru import logger
 from fastapi import Depends
 
-from db.Database.models import User
-from db.Database.user_schema import UserCreateSchema
-from app.infrastructure.repositories.user_repository import UserRepository
-from app.services.auth_services.hash_sevice import HashService
-from app.services.base_service import BaseService
+from ..db.Database.models import User
+from ..db.Database.user_schema import UserCreateSchema, AdminCreateSchema
+from ..db.Database.database_actions import UserRepository
+from ..services.auth.hash_service import HashService
+from ..services.base_service import BaseService
 
 
 class UserService(BaseService):
@@ -21,13 +21,25 @@ class UserService(BaseService):
         self.hash_service = hash_service
 
     async def create_user(self, user_body: UserCreateSchema) -> User:
-        logger.info(f"Creating user with mobile number {user_body.mobile_number}")
+        logger.info(f"Creating user with email {user_body.email}")
         return self.user_repository.create_user(
             User(
                 first_name=user_body.first_name,
                 last_name=user_body.last_name,
-                mobile_number=user_body.mobile_number,
+                email=user_body.email,
                 hashed_password=self.hash_service.hash_password(user_body.password),
+            )
+        )
+    
+    async def create_admin(self, user_body: AdminCreateSchema) -> User:
+        logger.info(f"Creating an admin with email {user_body.email}")
+        return self.user_repository.create_user(
+            User(
+                first_name=user_body.first_name,
+                last_name=user_body.last_name,
+                email=user_body.email,
+                hashed_password=self.hash_service.hash_password(user_body.password),
+                admin=True,
             )
         )
 
@@ -43,6 +55,8 @@ class UserService(BaseService):
         logger.info(f"Fetching user with id {user_id}")
         return self.user_repository.get_user(user_id)
 
-    async def get_user_by_mobile_number(self, mobile_number: str) -> User:
-        logger.info(f"Fetching user with mobile number {mobile_number}")
-        return self.user_repository.get_user_by_mobile_number(mobile_number)
+    
+    
+    async def get_user_by_email(self, email: str) -> User:
+        logger.info(f"Fetching user with email {email}")
+        return self.user_repository.get_user_by_mobile_number(email)

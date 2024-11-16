@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: "kino-iam"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+      PGADMIN_DEFAULT_PASSWORD: "1234"
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:6
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+
+  iam:
+    build: .
+      #  context: ../iam
+      #  dockerfile: Dockerfile
+    container_name: iam_service
+    environment:
+      DATABASE_DIALECT: postgresql+psycopg2
+      DATABASE_HOSTNAME: postgres_db
+      DATABASE_NAME: "kino-iam"
+      DATABASE_PASSWORD: 1234
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DEBUG_MODE: False
+      REDIS_URL: redis
+      JWT_SECRET_KEY: 1807372bcbf0963ebe30a1df3669690b8f0e4f83a1b52e7579cfee9ff08db230
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      OTP_EXPIRE_TIME: 60
+
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+      
+
+    # networks:
+    #   - app-network
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.iam-service.rule=Host(`iam.localhost`)"
+    #   - "traefik.http.routers.iam-service.entrypoints=web"
+    #   - "traefik.http.services.iam-service.loadbalancer.server.port=80"
+
+    restart: unless-stopped
+
+    depends_on:
+      - postgres
+      - redis
+
+
+
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:

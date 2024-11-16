@@ -1,4 +1,4 @@
-from db.Database.database import get_settings, Settings
+from ..db.Database.database import get_settings, Settings
 
 
 class BaseService:

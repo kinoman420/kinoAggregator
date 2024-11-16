@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 
-from iam.services.base_service import BaseService
+from ..base_service import BaseService
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 from parsers import nyaasi,fitgirl,dodi, yts
+from iam.endpoints import user
 
 
 app = FastAPI()
+app.include_router(user.user_router)
 
 origins = [ "http://localhost:3000" ]
 
