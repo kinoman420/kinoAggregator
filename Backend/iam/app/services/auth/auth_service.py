@@ -29,16 +29,13 @@ class AuthService(BaseService):
         existing_user = await self.user_service.get_user_by_email(
             user.email
         )
-        logger.info(f"Authenticating user with email {user.email}")
 
         if not existing_user:
-            logger.error(f"User with email {user.email} does not exist")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User does not exist"
             )
 
         if not existing_user.is_verified:
-            logger.error(f"User with email {user.email} is not verified")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User is not verified"
             )
@@ -46,7 +43,6 @@ class AuthService(BaseService):
         if not self.hash_service.verify_password(
             user.password, existing_user.hashed_password
         ):
-            logger.error(f"Invalid password for user with email {user.email}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username or password",
@@ -54,11 +50,9 @@ class AuthService(BaseService):
             )
         access_token = self.create_access_token(data={"sub": str(existing_user.id)})
 
-        logger.info(f"User with email {user.email} authenticated successfully")
         return TokenSchema(access_token=access_token, token_type="bearer")
 
     def create_access_token(self, data: dict) -> str:
-        logger.info("Creating access token")
         to_encode = data.copy()
         expire = datetime.now(timezone.utc) + timedelta(
             self.config.ACCESS_TOKEN_EXPIRE_MINUTES
@@ -79,7 +73,6 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    logger.info(f"Validating token {token}")
     try:
         payload = jwt.decode(
             token,
@@ -92,10 +85,8 @@ async def get_current_user(
             logger.error("Could not validate credentials")
             raise credentials_exception
     except jwt.PyJWTError:
-        logger.error("Error decoding token")
         raise credentials_exception
 
-    logger.info(f"User with id {user_id} validated successfully")
     return user
 
 async def get_current_active_admin(current_user: User = Depends(get_current_user)):

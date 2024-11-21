@@ -8,8 +8,7 @@ from .token_schema import TokenSchema
 
 
 class UserBaseSchema(BaseModel):
-    first_name: str
-    last_name: str
+    username: str
     email: str = Field(..., pattern=r".+@.+\.com")
 
 

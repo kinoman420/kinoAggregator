@@ -47,11 +47,11 @@ DATABASE_URL = (
 
 engine = create_engine(DATABASE_URL, echo=config.DEBUG_MODE, future=True)
 
-EntityBase = declarative_base()
+Base = declarative_base()
 
 
 def init_db() -> bool:
-    EntityBase.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     return True
 
 
@@ -65,7 +65,7 @@ session_local = sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
 
 def get_entitybase():
-    return EntityBase
+    return Base
 
 
 def get_db() -> Generator[Session, None, None]:

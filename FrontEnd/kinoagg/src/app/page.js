@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Card from './components/card';
 import { roboto_mono } from './ui/font';
+import Link from 'next/link'
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -53,6 +54,9 @@ export default function Home() {
     <div className={`container ${roboto_mono.className}`}>
       <header className="flex justify-between items-center  px-4">
         <h1 className="text-3xl font-bold">Kaggregator</h1>
+        <h2 classname="text-3xl font-bold">
+          <Link href="/login">Login</Link>
+        </h2>
         <form onSubmit={handleSearch} className="flex items-center">
           <input 
             type="text" 

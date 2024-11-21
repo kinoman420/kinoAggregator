@@ -1,6 +1,6 @@
 import random
 from typing import Annotated
-from loguru import logger
+
 from fastapi import Depends
 from redis import Redis
 
@@ -22,7 +22,6 @@ class OTPService(BaseService):
     def send_otp(self, email: str):
         otp = self.__generate_otp()
         self.redis_client.setex(email, self.config.OTP_EXPIRE_TIME, otp)
-        logger.info(f"OTP {otp} sent to email {email}")
         return otp
 
     def verify_otp(self, email: str, otp: str) -> bool:

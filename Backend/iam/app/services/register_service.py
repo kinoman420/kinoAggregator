@@ -1,5 +1,5 @@
 from typing import Annotated
-from loguru import logger
+
 from fastapi import Depends, HTTPException, status
 
 from ..db.Database.user_schema import (
@@ -37,7 +37,6 @@ class RegisterService(BaseService):
         )
 
         if existing_email:
-            logger.error(f"User with email {user.email} already exists")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
             )
@@ -45,7 +44,6 @@ class RegisterService(BaseService):
         new_user = await self.user_service.create_user(user)
         otp = self.otp_service.send_otp(new_user.email)
 
-        logger.info(f"User with email {user.email} created successfully")
         return UserCreateResponseSchema(
             user=UserSchema.model_validate(new_user),
             OTP=otp,
@@ -59,7 +57,6 @@ class RegisterService(BaseService):
         )
 
         if existing_email:
-            logger.error(f"Admin with email {user.email} already exists")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Admin already exists"
             )
@@ -67,11 +64,10 @@ class RegisterService(BaseService):
         new_user = await self.user_service.create_admin(user)
         otp = self.otp_service.send_otp(new_user.email)
 
-        logger.info(f"Admin with email {user.email} created successfully")
         return UserCreateResponseSchema(
             user=UserSchema.model_validate(new_user),
             OTP=otp,
-            message="User created successfully, OTP sent to email",
+            message="Admin created successfully, OTP sent to email",
         )
 
 
@@ -81,7 +77,6 @@ class RegisterService(BaseService):
         if not self.otp_service.verify_otp(
             verify_user_schema.email, verify_user_schema.OTP
         ):
-            logger.error(f"Invalid OTP for email {verify_user_schema.email}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP"
             )
@@ -92,7 +87,6 @@ class RegisterService(BaseService):
 
         await self.user_service.update_user(user.id, {"is_verified": True})
 
-        logger.info(f"User with email {verify_user_schema.email} verified")
         return VerifyOTPResponseSchema(
             verified=True, message="User verified successfully"
         )
@@ -104,26 +98,22 @@ class RegisterService(BaseService):
             resend_otp_schema.email
         )
         if not existing_user:
-            logger.error(f"User with email {resend_otp_schema.email} does not exist")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User does not exist"
             )
 
         if existing_user.is_verified:
-            logger.error(f"User with email {resend_otp_schema.email} already verified")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User already verified"
             )
 
         if self.otp_service.check_exist(resend_otp_schema.email):
-            logger.error(f"OTP for email {resend_otp_schema.email} already exists")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="OTP already exists"
             )
 
         otp = self.otp_service.send_otp(resend_otp_schema.email)
 
-        logger.info(f"OTP resent to email {resend_otp_schema.email}")
         return ResendOTPResponseSchema(
             email=resend_otp_schema.email,
             OTP=otp,

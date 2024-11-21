@@ -1,5 +1,5 @@
 from redis import Redis
-from loguru import logger
+
 
 from ..db.Database.database import get_settings
 
@@ -12,12 +12,10 @@ try:
         charset="utf-8",
         decode_responses=True
     )
-    
-
 except Exception as e:
     redis_client = None
 
 
-@logger.catch
+
 def get_redis_client():
     return redis_client
