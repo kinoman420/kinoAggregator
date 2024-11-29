@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from loguru import logger
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -12,7 +11,7 @@ from .hash_service import HashService
 from ..base_service import BaseService
 from ..user_service import UserService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/users/Token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/endpoints/user/Token")
 
 
 class AuthService(BaseService):
@@ -26,9 +25,7 @@ class AuthService(BaseService):
         self.hash_service = hash_service
 
     async def authenticate_user(self, user: UserLoginSchema) -> TokenSchema:
-        existing_user = await self.user_service.get_user_by_email(
-            user.email
-        )
+        existing_user = await self.user_service.get_user_by_email(user.email)
 
         if not existing_user:
             raise HTTPException(
@@ -50,7 +47,7 @@ class AuthService(BaseService):
             )
         access_token = self.create_access_token(data={"sub": str(existing_user.id)})
 
-        return TokenSchema(access_token=access_token, token_type="bearer")
+        return TokenSchema(access_token=access_token, is_admin=existing_user.admin , token_type="bearer")
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()
@@ -82,7 +79,6 @@ async def get_current_user(
         user_id: str = payload.get("sub")
         user = await user_service.get_user(user_id)
         if user_id is None:
-            logger.error("Could not validate credentials")
             raise credentials_exception
     except jwt.PyJWTError:
         raise credentials_exception

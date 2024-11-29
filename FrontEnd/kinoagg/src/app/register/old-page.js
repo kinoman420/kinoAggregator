@@ -5,48 +5,41 @@ import { useFormState, useFormStatus } from 'react-dom'
 import { signup } from '../actions/auth'
 import { roboto_mono } from '../ui/font';
 import { useActionState } from 'react'
-import Link from 'next/link'
-import { useRouter } from "next/navigation";
-
  
 function SignupForm() {
 
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const router = useRouter;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
     try {
-        const response = await fetch('/api/Token', {
+        const response = await fetch('localhost:8000/Register', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             },
-            body: new URLSearchParams({
-                'username': username,
-                'password': password,
-            }),
+            body: JSON.stringify({ email, password }),
         });
 
         const exists = await response.json();
 
         if (response.ok) {
             
-            const data = await response.json();
-            localStorage.setItem('token', data.access_token);
-            localStorage.setItem('username', username);
-            localStorage.setItem('is_admin', data.is_admin);
-            router.push('/');
+            if (exists) {
+                setError('User already exists.');
+            } else {
+                setError('User does not exist.');
+               
+            }
         } else {
             
             setError('Something went wrong.');
-            
         }
     } catch (error) {
         setError('Network error. Please try again.');
@@ -59,6 +52,17 @@ function SignupForm() {
     <div className={`flex items-center justify-center min-h-screen bg-gray-100 ${roboto_mono.className}` }>
         <div className="w-full max-w-xs">
         <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit}>
+            <div className="mb-4">
+                <input
+                    id="username"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    placeholder="username"
+                    value={email}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                />
+            </div>
             <div className="mb-4">
                 <input
                     id="email"
@@ -95,9 +99,7 @@ function SignupForm() {
             <div className="flex items-center justify-center">
                 <SubmitButton />
             </div>
-            <p className="text-center text-gray-600 text-xs mt-4">
-                Don't have an account? <Link href="/register" className="text-blue-500 hover:text-blue-800">Register </Link>
-            </p>
+
         </form>
         </div>
     </div>
@@ -110,7 +112,7 @@ function SubmitButton() {
    
     return (
       <button disabled={pending} className="text-black bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-        Log in
+        Register
       </button>
     )
   }

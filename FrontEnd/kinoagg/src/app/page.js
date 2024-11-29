@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Card from './components/card';
 import { roboto_mono } from './ui/font';
 import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -24,6 +25,38 @@ export default function Home() {
   const [items, setItems] = useState([]);
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
+
+  const [username, setUsername] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+      const storedUsername = localStorage.getItem('username');
+      const storedIsAdmin = localStorage.getItem('is_admin') === 'true';
+      
+      if (storedUsername) {
+          setUsername(storedUsername);
+          setIsAdmin(stored)
+      }
+  }, []);
+
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('is_admin');
+    setUsername(null);
+    setIsAdmin(false);
+    router.push('/');
+};
+
+const handleUsernameClick = () => {
+  if (isAdmin) {
+      router.push('/admin-dashboard'); 
+  } else {
+      router.push('/user-dashboard'); 
+  }
+};
 
   useEffect(() => {
     if (debouncedQuery) {
@@ -54,9 +87,19 @@ export default function Home() {
     <div className={`container ${roboto_mono.className}`}>
       <header className="flex justify-between items-center  px-4">
         <h1 className="text-3xl font-bold">Kaggregator</h1>
-        <h2 classname="text-3xl font-bold">
+        {username ? (
+          <>
+            <span onClick={handleUsernameClick} style={{ cursor: 'pointer' }}>
+                {username}
+            </span>
+            <button onClick={handleLogout}>Logout</button>
+          </>
+        ):(
+          <h2 className="text-3xl font-bold">
           <Link href="/login">Login</Link>
-        </h2>
+          </h2>
+        )}
+
         <form onSubmit={handleSearch} className="flex items-center">
           <input 
             type="text" 

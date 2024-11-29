@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 class TokenSchema(BaseModel):
     access_token: str
+    is_admin: bool
     token_type: str
 
 
-class TokenDataSchema(BaseModel):
-     email: Optional[str] = None
+

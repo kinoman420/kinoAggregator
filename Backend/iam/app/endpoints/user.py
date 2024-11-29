@@ -4,7 +4,7 @@ from typing import Annotated
 
 
 from ..db.Database.models import User
-from ..db.Database.token_schema import TokenSchema, TokenDataSchema
+from ..db.Database.token_schema import TokenSchema
 from ..db.Database.user_schema import (
     UserCreateSchema,
     UserCreateResponseSchema,
@@ -33,7 +33,7 @@ async def register(admin: AdminCreateSchema, register_service: Annotated[Registe
 
 
 @user_router.post("/Token", response_model=TokenSchema, status_code=status.HTTP_200_OK)
-async def login_for_access_token( form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+async def login( form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  auth_service: Annotated[AuthService, Depends()],) -> TokenSchema:
 
     return await auth_service.authenticate_user(
