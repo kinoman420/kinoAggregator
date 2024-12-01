@@ -40,6 +40,14 @@ class VerifyOTPSchema(BaseModel):
 class ResendOTPSchema(BaseModel):
     email: str
 
+class TestOTPSchema(ResendOTPSchema):
+    pass
+
+
+class TestOTPResponseSchema(BaseModel):
+    email: str
+    OTP: str
+    message: str
 
 class ResendOTPResponseSchema(BaseModel):
     email: str

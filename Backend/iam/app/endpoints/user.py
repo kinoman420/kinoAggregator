@@ -15,8 +15,11 @@ from ..db.Database.user_schema import (
     VerifyOTPResponseSchema,
     ResendOTPSchema,
     ResendOTPResponseSchema,
+    TestOTPResponseSchema,
+    TestOTPSchema
 )
 from ..services.auth.auth_service import AuthService, get_current_user, get_current_active_admin
+from ..services.auth.otp_service import OTPService
 from ..services.register_service import RegisterService
 from ..services.user_service import UserService
 
@@ -30,6 +33,11 @@ async def register(user: UserCreateSchema, register_service: Annotated[RegisterS
 @user_router.post("/RegisterAdmin",response_model=UserCreateResponseSchema,status_code=status.HTTP_201_CREATED,)
 async def register(admin: AdminCreateSchema, register_service: Annotated[RegisterService, Depends()]) -> UserCreateResponseSchema:
     return await register_service.register_admin(admin)
+
+
+@user_router.post("/testOTP", response_model=TestOTPResponseSchema, status_code=status.HTTP_200_OK)
+async def send_otp(send_otp_schema: TestOTPSchema, otp_service: Annotated[OTPService, Depends()]) -> TestOTPSchema:
+    return await otp_service.send_otp(send_otp_schema)
 
 
 @user_router.post("/Token", response_model=TokenSchema, status_code=status.HTTP_200_OK)
