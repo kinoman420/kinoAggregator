@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 const Card = ({ item }) => {
-    console.log(item); // Debug: Log the item data to verify
+    console.log(item); 
   
     if (!item) {
       return null;
